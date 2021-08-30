@@ -1,6 +1,7 @@
 import re
+
 import matplotlib.pyplot as plt
-from torch import tensor, optim, exp, arange
+from torch import tensor, optim, exp
 from torch.nn.functional import mse_loss
 
 sample_days = []
@@ -44,7 +45,7 @@ plt.xlabel('x = length')
 plt.ylabel('y = weight')
 
 plt.scatter(sample_days, sample_head_circumferences)
-plt.scatter(sample_days, model.f(sample_days).detach().flatten(), color='orange')
+plt.scatter(sample_days, model.f(sample_days).detach().flatten(), color='orange', label='$f(x) = 20\sigma(xW + b) + 31$ \n$\sigma(z) = \dfrac{1}{1+e^{-z}}$')
 
 plt.legend()
 plt.show()

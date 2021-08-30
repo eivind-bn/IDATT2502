@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Regression.iml" filepath="$PROJECT_DIR$/.idea/Regression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../IDATT2502/.idea/IDATT2502.iml" filepath="$PROJECT_DIR$/../IDATT2502/.idea/IDATT2502.iml" />
     </modules>
   </component>
 </project>

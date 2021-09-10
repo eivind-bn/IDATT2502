@@ -7,7 +7,7 @@ from torch.nn.functional import mse_loss
 sample_days = []
 sample_head_circumferences = []
 
-with open('day_head_circumference.csv') as file:
+with open('Regression/day_head_circumference.csv') as file:
     formatted = re.findall("(\\d+\\.\\d+e[+-]\\d+),(\\d\\.\\d+e[+-]\\d+)", file.read())
 
     for(day, head_circumference) in formatted:

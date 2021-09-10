@@ -9,7 +9,7 @@ sample_length = []
 sample_weights = []
 
 
-with open('day_length_weight.csv') as file:
+with open('Regression/day_length_weight.csv') as file:
     formatted = re.findall("(\\d+\\.\\d+e[+-]\\d+),(\\d+\\.\\d+e[+-]\\d+),(\\d\\.\\d+e[+-]\\d+)", file.read())
 
     for(day, length, weight) in formatted:

@@ -6,7 +6,7 @@ from torch.nn.functional import mse_loss
 sample_lengths = []
 sample_weights = []
 
-with open('length_weight.csv') as file:
+with open('Regression/length_weight.csv') as file:
     formatted = re.findall("(\\d+\\.\\d+e[+-]\\d+),(\\d\\.\\d+e[+-]\\d+)", file.read())
 
     for(length, weight) in formatted:

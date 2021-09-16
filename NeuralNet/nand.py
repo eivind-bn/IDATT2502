@@ -1,8 +1,9 @@
 
 import torch
 import torch.nn.functional
-import numpy as np
 import matplotlib.pyplot as plt
+
+from numpy import meshgrid, linspace, empty, double
 
 
 sampleIn = torch.tensor([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]).reshape(-1, 2)
@@ -27,10 +28,8 @@ class NandModel:
 model = NandModel()
 optimizer = torch.optim.SGD([model.b, model.W, model.W], 0.1)
 
-for epoch in range(25_000):
-    model.loss(sampleIn[:, 0].reshape(-1, 1),
-               sampleIn[:, 1].reshape(-1, 1),
-               sampleOut).backward()
+for epoch in range(10_000):
+    model.loss(sampleIn[:, 0].reshape(-1, 1), sampleIn[:, 1].reshape(-1, 1), sampleOut).backward()
     optimizer.step()
     optimizer.zero_grad()
 
@@ -38,14 +37,15 @@ for epoch in range(25_000):
 print(f'W = {model.W}, b = {model.b}, loss = {model.loss(sampleIn[:, 0].reshape(-1, 1), sampleIn[:, 1].reshape(-1, 1), sampleOut)}')
 
 
-x1_grid, x2_grid = np.meshgrid(np.linspace(-0.1, 1.1, 100), np.linspace(-0.1, 1.1, 100))
-y_grid = np.empty([100, 100], dtype=np.double)
+in1, in2 = meshgrid(linspace(-0.1, 1.1, 100), linspace(-0.1, 1.1, 100))
+out = empty([100, 100], dtype=double)
 
-for i in range(0, x1_grid.shape[0]):
-    for j in range(0, x1_grid.shape[1]):
-        tenseX = torch.tensor(float(x1_grid[i, j])).reshape(-1, 1)
-        tenseY = torch.tensor(float(x2_grid[i, j])).reshape(-1, 1)
-        y_grid[i, j] = model.f(tenseX, tenseY)
+for i in range(0, in1.shape[0]):
+    for j in range(0, in1.shape[1]):
+        out[i, j] = model.f(
+            torch.tensor(float(in1[i, j])).reshape(-1, 1),
+            torch.tensor(float(in2[i, j])).reshape(-1, 1)
+        )
 
 
 fig = plt.figure()
@@ -63,7 +63,7 @@ table = plt.table(cellText=[[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 0]],
                   cellLoc="center",
                   loc="upper left")
 
-plot.plot_wireframe(x1_grid, x2_grid, y_grid, color="green")
+plot.plot_wireframe(in1, in2, out, color="green")
 plot.plot(sampleIn[:, 0].squeeze(),
           sampleIn[:, 1].squeeze(),
           sampleOut[:, 0].squeeze(),

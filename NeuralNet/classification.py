@@ -1,38 +1,29 @@
-import tabulate
 import torch
 import torch.nn.functional
 import torchvision
 import matplotlib.pyplot as plt
 
-# Using the MNIST-dataset for loading handwritten numbers. Divides it into two sets, one for training and one for testing. Used https://gitlab.com/ntnu-tdat3025/ann/mnist/-/blob/master/main.py for loading, but removed './data' in MNIST as '' is enough.
 mnist_train = torchvision.datasets.MNIST('', train=True, download=True)
-x_train = mnist_train.data.reshape(-1, 784).float()  # Reshape input
-# Create output tensor
-y_train = torch.zeros((mnist_train.targets.shape[0], 10))
-y_train[torch.arange(mnist_train.targets.shape[0]),
-        mnist_train.targets] = 1  # Populate output
-
 mnist_test = torchvision.datasets.MNIST('', train=False, download=True)
-x_test = mnist_test.data.reshape(-1, 784).float()  # Reshape input
-# Create output tensor
-y_test = torch.zeros((mnist_test.targets.shape[0], 10))
-y_test[torch.arange(mnist_test.targets.shape[0]),
-       mnist_test.targets] = 1  # Populate output
+
+sampleIn = mnist_train.data.reshape(-1, 784).float()
+testIn = mnist_test.data.reshape(-1, 784).float()
+
+sampleOut = torch.zeros((mnist_train.targets.shape[0], 10))
+sampleOut[torch.arange(mnist_train.targets.shape[0]), mnist_train.targets] = 1
+
+testOut = torch.zeros((mnist_test.targets.shape[0], 10))
+testOut[torch.arange(mnist_test.targets.shape[0]), mnist_test.targets] = 1
 
 
-class handwritingClassification_model:
+class HandwritingClassificationModel:
     def __init__(self):
-        # Initializes with 784 rows of 10 ones
         self.W = torch.ones([784, 10], requires_grad=True)
-        # Initializes with 1 row of 10 ones
         self.b = torch.ones([1, 10], requires_grad=True)
 
-    # Predictor
     def f(self, x):
-        # Have to set dim=1 as I got a warning. Implicit dim is deprecated
         return torch.nn.functional.softmax(x @ self.W + self.b, dim=1)
 
-    # Uses Cross Entropy
     def loss(self, x, y):
         return torch.nn.functional.binary_cross_entropy_with_logits(self.f(x), y)
 
@@ -40,33 +31,20 @@ class handwritingClassification_model:
         return torch.mean(torch.eq(self.f(x).argmax(1), y.argmax(1)).float())
 
 
-model = handwritingClassification_model()
+model = HandwritingClassificationModel()
+optimizer = torch.optim.SGD([model.W, model.b], lr=0.1)
 
-"""------------------ optimize ------------------"""
-learning_rate = 0.1
-epoch = 10_000
+for _ in range(250):
+    model.loss(sampleIn, sampleOut).backward()
+    optimizer.step()
+    optimizer.zero_grad()
 
-optimizer = torch.optim.SGD([model.W, model.b], lr=learning_rate)
-results = []
-for index, epoch in enumerate(range(epoch)):
-    if (index+1) % 1000 == 0:
-        print(f'epoch = {index+1}, loss = {model.loss(x_train, y_train).item()}, accuracy = {model.accuracy(x_test, y_test).item() * 100}%')
-        results.append([index+1, model.loss(x_train, y_train).item(),
-                        model.accuracy(x_test, y_test).item() * 100])
+print(f'loss = {model.loss(sampleIn, sampleOut).item()}, accuracy = {model.accuracy(testIn, testOut).item()}')
 
-    model.loss(x_train, y_train).backward()  # Compute loss gradients
-    optimizer.step()  # Perform optimization by adjusting W and b
-    optimizer.zero_grad()  # Clear gradients for next step
-
-print(tabulate.tabulate(results, headers=['epoch', 'loss', 'accuracy']))
-
-"""------------------ visualize ------------------"""
-fig = plt.figure('Oppgave D')
-fig.suptitle('MNIST - classification of handwritten numbers')
 for i in range(10):
     plt.subplot(2, 5, i+1)
     plt.imshow(model.W[:, i].detach().numpy().reshape(28, 28))
-    plt.title(f'W: {i}')
+    plt.title(f'img: {i}')
     plt.xticks([])
     plt.yticks([])
 

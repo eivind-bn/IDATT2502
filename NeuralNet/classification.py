@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 mnist_train = torchvision.datasets.MNIST('', train=True, download=True)
 mnist_test = torchvision.datasets.MNIST('', train=False, download=True)
 
-sampleIn = mnist_train.data.reshape(-1, 784).float()
-testIn = mnist_test.data.reshape(-1, 784).float()
+train_in = mnist_train.data.reshape(-1, 784).float()
+test_in = mnist_test.data.reshape(-1, 784).float()
 
-sampleOut = torch.zeros((mnist_train.targets.shape[0], 10))
-sampleOut[torch.arange(mnist_train.targets.shape[0]), mnist_train.targets] = 1
+train_out = torch.zeros((mnist_train.targets.shape[0], 10))
+train_out[torch.arange(mnist_train.targets.shape[0]), mnist_train.targets] = 1
 
-testOut = torch.zeros((mnist_test.targets.shape[0], 10))
-testOut[torch.arange(mnist_test.targets.shape[0]), mnist_test.targets] = 1
+test_out = torch.zeros((mnist_test.targets.shape[0], 10))
+test_out[torch.arange(mnist_test.targets.shape[0]), mnist_test.targets] = 1
 
 
 class HandwritingClassificationModel:
@@ -35,11 +35,12 @@ model = HandwritingClassificationModel()
 optimizer = torch.optim.SGD([model.W, model.b], lr=0.1)
 
 for _ in range(250):
-    model.loss(sampleIn, sampleOut).backward()
+    model.loss(train_in, train_out).backward()
     optimizer.step()
     optimizer.zero_grad()
 
-print(f'loss = {model.loss(sampleIn, sampleOut).item()}, accuracy = {model.accuracy(testIn, testOut).item()}')
+print(f'loss = {model.loss(train_in, train_out).item()}, '
+      f'accuracy = {model.accuracy(test_in, test_out).item()}')
 
 for i in range(10):
     plt.subplot(2, 5, i+1)

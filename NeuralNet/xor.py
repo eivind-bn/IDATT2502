@@ -1,13 +1,12 @@
 
-import torch
-import torch.nn.functional
-import matplotlib.pyplot as plt
-import numpy as np
 import random
 
+import matplotlib.pyplot as plt
+import torch
+import torch.nn.functional
 
-sampleIn = torch.tensor([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]).reshape(-1, 2)
-sampleOut = torch.tensor([[0.0], [1.0], [1.0], [0.0]]).reshape(-1, 1)
+train_in = torch.tensor([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]).reshape(-1, 2)
+train_out = torch.tensor([[0.0], [1.0], [1.0], [0.0]]).reshape(-1, 1)
 
 
 class XorModel:
@@ -32,11 +31,15 @@ model = XorModel()
 
 optimizer = torch.optim.SGD([model.b1, model.b2, model.W1, model.W2], lr=1)
 for epoch in range(100_000):
-    model.loss(sampleIn, sampleOut).backward()
+    model.loss(train_in, train_out).backward()
     optimizer.step()
     optimizer.zero_grad()
 
-print(f'W1 = {model.W1}, W2 = {model.W2}, b1 = {model.b1}, b2 = {model.b2}, loss = {model.loss(x_train.reshape(-1, 2), y_train)}')
+print(f'W1 = {model.W1}, '
+      f'W2 = {model.W2}, '
+      f'b1 = {model.b1}, '
+      f'b2 = {model.b2}, '
+      f'loss = {model.loss(train_in.reshape(-1, 2), train_out)}')
 
 
 fig = plt.figure()
@@ -44,8 +47,21 @@ ax = fig.gca(projection='3d')
 
 plt.table(cellText=[[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]],
           colWidths=[0.1] * 3,
-          colLabels=["$x_1$", "$x_2$", "$f(x)$"],
+          colLabels=["$x$", "$y$", "$f(x)$"],
           cellLoc="center",
           loc="lower right")
 
+x = torch.arange(0, 1, 0.02)
+y = torch.arange(0, 1, 0.02)
 
+z = torch.empty(len(x),len(y), dtype=torch.double)
+
+for i in range(len(x)):
+    for j in range(len(y)):
+        z[i,j] = float(model.f(torch.tensor([float(x[i]), float(y[j])])))
+
+x,y = torch.meshgrid(x,y)
+ax.plot_wireframe(x, y, z, color='darkred')
+
+
+plt.show()

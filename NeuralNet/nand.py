@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from numpy import meshgrid, linspace, empty, double
 
 
-sampleIn = torch.tensor([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]).reshape(-1, 2)
-sampleOut = torch.tensor([[1.0], [1.0], [1.0], [0.0]]).reshape(-1, 1)
+train_in = torch.tensor([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]).reshape(-1, 2)
+train_out = torch.tensor([[1.0], [1.0], [1.0], [0.0]]).reshape(-1, 1)
 
 
 class NandModel:
@@ -29,12 +29,14 @@ model = NandModel()
 optimizer = torch.optim.SGD([model.b, model.W, model.W], 0.1)
 
 for epoch in range(10_000):
-    model.loss(sampleIn[:, 0].reshape(-1, 1), sampleIn[:, 1].reshape(-1, 1), sampleOut).backward()
+    model.loss(train_in[:, 0].reshape(-1, 1), train_in[:, 1].reshape(-1, 1), train_out).backward()
     optimizer.step()
     optimizer.zero_grad()
 
 
-print(f'W = {model.W}, b = {model.b}, loss = {model.loss(sampleIn[:, 0].reshape(-1, 1), sampleIn[:, 1].reshape(-1, 1), sampleOut)}')
+print(f'W = {model.W}, '
+      f'b = {model.b}, '
+      f'loss = {model.loss(train_in[:, 0].reshape(-1, 1), train_in[:, 1].reshape(-1, 1), train_out)}')
 
 
 in1, in2 = meshgrid(linspace(-0.1, 1.1, 100), linspace(-0.1, 1.1, 100))
@@ -64,9 +66,9 @@ table = plt.table(cellText=[[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 0]],
                   loc="upper left")
 
 plot.plot_wireframe(in1, in2, out, color="green")
-plot.plot(sampleIn[:, 0].squeeze(),
-          sampleIn[:, 1].squeeze(),
-          sampleOut[:, 0].squeeze(),
+plot.plot(train_in[:, 0].squeeze(),
+          train_in[:, 1].squeeze(),
+          train_out[:, 0].squeeze(),
           'o',
           color="blue")
 

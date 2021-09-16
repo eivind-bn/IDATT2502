@@ -3,8 +3,8 @@ import torch.nn.functional
 import matplotlib.pyplot as plt
 
 
-sampleIn = torch.tensor([[0.0], [1.0]]).reshape(-1, 1)
-sampleOut = torch.tensor([[1.0], [0.0]]).reshape(-1, 1)
+train_in = torch.tensor([[0.0], [1.0]]).reshape(-1, 1)
+train_out = torch.tensor([[1.0], [0.0]]).reshape(-1, 1)
 
 
 class NotModel:
@@ -26,12 +26,14 @@ model = NotModel()
 optimizer = torch.optim.SGD([model.b, model.W], 0.1)
 
 for epoch in range(10_000):
-    model.loss(sampleIn, sampleOut).backward()
+    model.loss(train_in, train_out).backward()
     optimizer.step()
     optimizer.zero_grad()
 
 
-print(f'W = {model.W}, b = {model.b}, loss = {model.loss(sampleIn, sampleOut)}')
+print(f'W = {model.W}, '
+      f'b = {model.b}, '
+      f'loss = {model.loss(train_in, train_out)}')
 
 
 plt.xlabel('in')
@@ -43,9 +45,7 @@ plt.table(cellText=[[0, 1], [1, 0]],
           loc="lower left")
 
 
-plt.scatter(sampleIn, sampleOut)
-
-testIn = torch.arange(0.0, 1.0, 0.001).reshape(-1, 1)
-testOut = model.f(testIn).detach()
-plt.plot(testIn, testOut, color="orange")
+test_in = torch.arange(0.0, 1.0, 0.001).reshape(-1, 1)
+test_out = model.f(test_in).detach()
+plt.plot(test_in, test_out, color="orange")
 plt.show()

@@ -62,7 +62,7 @@ model = LongShortTermMemoryModel(encoding_size)
 
 
 optimizer = torch.optim.RMSprop(model.parameters(), 0.001)
-for epoch in range(1500):
+for epoch in range(10000):
     model.reset()
     model.loss(x_train, y_train).backward()
     optimizer.step()
